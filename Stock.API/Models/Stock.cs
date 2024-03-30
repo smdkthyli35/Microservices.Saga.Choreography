@@ -10,9 +10,9 @@ namespace Stock.API.Models
         [BsonElement(Order = 0)]
         public Guid Id { get; set; }
 
-        [BsonGuidRepresentation(GuidRepresentation.CSharpLegacy)]
+        [BsonRepresentation(BsonType.String)]
         [BsonElement(Order = 1)]
-        public Guid ProductId { get; set; }
+        public string ProductId { get; set; }
 
         [BsonRepresentation(BsonType.Int64)]
         [BsonElement(Order = 2)]

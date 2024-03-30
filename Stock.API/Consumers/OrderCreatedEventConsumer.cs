@@ -15,16 +15,16 @@ namespace Stock.API.Consumers
 
             foreach (var orderItem in context.Message.OrderItems)
             {
-                stockResult.Add(await (await collection.FindAsync(s => s.ProductId == orderItem.ProductId && s.Count >= orderItem.Count)).AnyAsync());
+                stockResult.Add(await (await collection.FindAsync(s => s.ProductId == orderItem.ProductId.ToString() && s.Count >= (long)orderItem.Count)).AnyAsync());
             }
 
             if (stockResult.TrueForAll(s => s.Equals(true)))
             {
                 foreach (var orderItem in context.Message.OrderItems)
                 {
-                    Models.Stock stock = await (await collection.FindAsync(s => s.ProductId == orderItem.ProductId)).FirstOrDefaultAsync();
+                    Models.Stock stock = await (await collection.FindAsync(s => s.ProductId == orderItem.ProductId.ToString())).FirstOrDefaultAsync();
                     stock.Count -= orderItem.Count;
-                    await collection.FindOneAndReplaceAsync(x => x.ProductId == orderItem.ProductId, stock);
+                    await collection.FindOneAndReplaceAsync(x => x.ProductId == orderItem.ProductId.ToString(), stock);
                 }
 
                 ISendEndpoint sendEndpoint = await sendEndpointProvider.GetSendEndpoint(new Uri($"queue:{RabbitMQSettings.Payment_StockReservedEventQueue}"));

@@ -1,4 +1,5 @@
 using MassTransit;
+using MongoDB.Driver;
 using Shared;
 using Stock.API.Consumers;
 using Stock.API.Services;
@@ -22,5 +23,18 @@ builder.Services.AddMassTransit(configurator =>
 builder.Services.AddSingleton<MongoDbService>();
 
 var app = builder.Build();
+
+using IServiceScope serviceScope = app.Services.CreateScope();
+MongoDbService? mongoDbService = serviceScope.ServiceProvider.GetService<MongoDbService>();
+IMongoCollection<Stock.API.Models.Stock> stockCollection = mongoDbService.GetCollection<Stock.API.Models.Stock>();
+if (!stockCollection.FindSync(s => true).Any())
+{
+    await stockCollection.InsertOneAsync(new() { ProductId = Guid.NewGuid().ToString(), Count = 100 });
+    await stockCollection.InsertOneAsync(new() { ProductId = Guid.NewGuid().ToString(), Count = 150 });
+    await stockCollection.InsertOneAsync(new() { ProductId = Guid.NewGuid().ToString(), Count = 200 });
+    await stockCollection.InsertOneAsync(new() { ProductId = Guid.NewGuid().ToString(), Count = 50 });
+    await stockCollection.InsertOneAsync(new() { ProductId = Guid.NewGuid().ToString(), Count = 5 });
+}
+
 
 app.Run();
