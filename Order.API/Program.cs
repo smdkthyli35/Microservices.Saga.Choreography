@@ -50,7 +50,7 @@ app.MapPost("/create-order", async (CreateOrderVM model, OrderAPIDbContext conte
         BuyerId = order.BuyerId,
         OrderId = order.Id,
         TotalPrice = order.TotalPrice,
-        OrderItemMessages = order.OrderItems.Select(oi => new OrderItemMessage()
+        OrderItems = order.OrderItems.Select(oi => new OrderItemMessage()
         {
             Count = oi.Count,
             Price = oi.Price,
